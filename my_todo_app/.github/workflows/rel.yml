@@ -1,0 +1,64 @@
+name: Flutter CI/CD Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - ci/flutter-workflow
+
+jobs:
+  # android:
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       flavour: [dev, staging, prod]
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - uses: subosito/flutter-action@v2
+  #       with:
+  #         flutter-version: "3.24.4"
+
+  #     - run: flutter pub get
+
+      # - run: flutter build appbundle --flavor ${{ matrix.flavour }} -t lib/main_${{ matrix.flavour }}.dart
+
+      # - name: Decode Play Store JSON
+      #   run: echo "${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON_BASE64 }}" | base64 --decode > playstore.json
+
+      # - uses: maierj/fastlane-action@v3.0.0
+      #   with:
+      #     lane: "android deploy_${{ matrix.flavour }}"
+      #   env:
+      #     SUPPLY_JSON_KEY: playstore.json
+      #     GOOGLE_PLAY_TRACK: internal
+
+  ios:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        flavour: [dev]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.24.0"
+
+      - run: flutter pub get
+
+      - run: flutter build ipa -t lib/main.dart --release
+
+      # - name: Decode Apple API key
+      #   run: echo "${{ secrets.APPLE_API_KEY_BASE64 }}" | base64 --decode > AuthKey.p8
+
+      # - uses: maierj/fastlane-action@v3.0.0
+      #   with:
+      #     lane: "ios deploy_${{ matrix.flavour }}"
+      #   env:
+      #     APP_STORE_CONNECT_API_KEY_PATH: AuthKey.p8
+      #     APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+      #     APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
